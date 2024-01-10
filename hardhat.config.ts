@@ -7,9 +7,13 @@ import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
 import "hardhat-deploy";
 import "solidity-coverage";
+import "hardhat-abi-exporter";
 import fs from  "fs";
 import { utils } from "ethers";
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/types";
+
+import "./tasks/commonTask"
+
 
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 
@@ -90,11 +94,20 @@ const config: HardhatUserConfig = {
       }
     },
     ropsten: {
-      url: `https://ropsten.infura.io/v3//${process.env.infuraKey}`,
+      url: `https://ropsten.infura.io/v3/${process.env.infuraKey}`,
       live: true,
       accounts:{
         mnemonic: mnemonic()
       }
+    },
+    sepolior: {
+      url: `https://sepolia.infura.io/v3/${process.env.infuraKey}`,
+      chainId: 11155111,
+      accounts: {
+        mnemonic: mnemonic(),
+        initialIndex: 0,
+      },
+      
     },
   },
   namedAccounts: {
@@ -120,7 +133,15 @@ const config: HardhatUserConfig = {
   gasReporter: {
     enabled: true,
     currency: 'USD'
-  }
+  },
+  abiExporter: {
+    path: './build/generate/json',
+    only: ["TestERC20"],
+    except: ['.*Mock$'],
+    clear: true,
+    flat: true,
+    runOnCompile: true
+  },
 };
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
